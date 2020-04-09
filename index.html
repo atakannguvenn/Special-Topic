@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+input[type=text], select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+
+input[type=submit] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+.container {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+</style>
+</head>
+<body>
+
+<h3>Memo Form</h3>
+
+<div class="container">
+  <form>
+    <label for="fname">From</label>
+    <input type="text" id="fname" name="firstname" placeholder="Your name..">
+
+    <label for="lname">To</label>
+    <input type="text" id="lname" name="lastname" placeholder="Receiver name..">
+
+    <label for="subject">Subject</label>
+    <textarea id="subject" name="subject" placeholder="Write something.." style="height:200px"></textarea>
+  </form>
+  <button onclick="myFunction();">Submit</button>
+  <p id="fname1"></p>
+  <p id="lname1"></p>
+  <p id="subject1"></p>
+  <p><span id="datetime"></span></p>
+
+</div>
+
+<script>
+    function myFunction() {
+        var x = "From: " + document.getElementById("fname").value;
+        document.getElementById("fname1").innerHTML = x;
+        var y = "To: " + document.getElementById("lname").value;
+        document.getElementById("lname1").innerHTML = y;
+        var dt = new Date();
+        document.getElementById("datetime").innerHTML = ("Date: "+("0"+(dt.getMonth()+1)).slice(-2)) +"/"+ (("0"+dt.getDate()).slice(-2)) +"/"+ (dt.getFullYear()) +" <br>"+ ("Time: "+("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
+        var a = "Message: " + document.getElementById("subject").value;
+        document.getElementById("subject1").innerHTML = a;
+      
+
+        var hiddenElement = document.createElement('a');
+
+        hiddenElement.href = 'data:attachment/text,' + encodeURI(x) + "\n" + encodeURI(y) +"\n"+ encodeURI(a)+"\n"+ encodeURI(dt);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = 'myFile.txt';
+        hiddenElement.click();
+    }
+</script>
+
+</body>
+</html>
+
