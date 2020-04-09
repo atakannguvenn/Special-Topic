@@ -1,86 +1,187 @@
-<!DOCTYPE html>
-<html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {font-family: Arial, Helvetica, sans-serif;}
-* {box-sizing: border-box;}
-
-input[type=text], select, textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  margin-top: 6px;
-  margin-bottom: 16px;
-  resize: vertical;
-}
-
-input[type=submit] {
-  background-color: #4CAF50;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-input[type=submit]:hover {
-  background-color: #45a049;
-}
-
-.container {
-  border-radius: 5px;
-  background-color: #f2f2f2;
-  padding: 20px;
-}
-</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {font-family: Arial, Helvetica, sans-serif;}
+    * {box-sizing: border-box;}
+    
+    input[type=text], select, textarea {
+      width: 100%;
+      height: 200px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      resize: vertical;
+    }
+    
+    input[type=textsmall], select, textarea {
+      width: 30%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      resize: vertical;
+    }
+    
+    input[type=submit] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 150px;
+      cursor: pointer;
+    }
+    
+    input[type=submit]:hover {
+      background-color: #45a049;
+    }
+    
+    .container {
+      border-radius: 5px;
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
+  <a href="#" hreflang="en" onclick="setLang('en'); return false">English</a>
+  <a href="#" hreflang="it" onclick="setLang('cn'); return false">Chinese</a>
 
-<h3>Memo Form</h3>
+  <div class="container", lang = "en">
+    <form>
+      <label for="fname" >From</label>
+      <br>
+      <input type="textsmall" id="fname" name="firstname" placeholder="Your name..">
+      <br>
+      <label for="lname">To</label>
+      <br>
+      <input type="textsmall" id="lname" name="lastname" placeholder="Receiver name..">
+      <br>
+      <label for="subject">Subject</label>
+      <br>
+      <textarea id="subject" name="subject" placeholder="Write something.." style = "width: 75%;"></textarea>
+    </form>
+    <button onclick="myFunctionEN();">Submit</button>
+    <p id="fname1"></p>
+    <p id="lname1"></p>
+    <p id="subject1"></p>
+    <p><span id="date"></span></p>
+    <p><span id="time"></span></p>
+  </div>
 
-<div class="container">
-  <form>
-    <label for="fname">From</label>
-    <input type="text" id="fname" name="firstname" placeholder="Your name..">
+  <div class="container", lang = "cn">
+    <form>
+      <label for="fname" >從</label>
+      <br>
+      <input type="textsmall" id="fname" name="firstname" placeholder="你的名字..">
+      <br>
+      <label for="lname">至</label>
+      <br>
+      <input type="textsmall" id="lname" name="lastname" placeholder="收件者姓名..">
+      <br>
+      <label for="subject">信息</label>
+      <br>
+      <textarea id="subject" name="subject" placeholder="寫一些東西.." style = "width: 75%;"></textarea>
+    </form>
+    <button onclick="myFunctionCN();">提交</button>
+    <p id="fname2"></p>
+    <p id="lname2"></p>
+    <p id="subject2"></p>
+    <p><span id="date2"></span></p>
+    <p><span id="time2"></span></p>
+  </div>
 
-    <label for="lname">To</label>
-    <input type="text" id="lname" name="lastname" placeholder="Receiver name..">
+</body>
 
-    <label for="subject">Subject</label>
-    <textarea id="subject" name="subject" placeholder="Write something.." style="height:200px"></textarea>
-  </form>
-  <button onclick="myFunction();">Submit</button>
-  <p id="fname1"></p>
-  <p id="lname1"></p>
-  <p id="subject1"></p>
-  <p><span id="datetime"></span></p>
 
-</div>
 
 <script>
-    function myFunction() {
+  let langs = ['en', 'cn'];
+  let lang = 'en';
+  setLangStyles(lang);
+
+  function setStyles(styles) {
+    var elementId = '__lang_styles';
+    var element = document.getElementById(elementId);
+    if (element) {
+      element.remove();
+    }
+
+    let style = document.createElement('style');
+    style.id = elementId;
+    style.type = 'text/css';
+
+    if (style.styleSheet) {
+      style.styleSheet.cssText = styles;
+    } else {
+      style.appendChild(document.createTextNode(styles));
+    }
+    document.getElementsByTagName('head')[0].appendChild(style);
+  }
+
+  function setLang(lang) {
+    setLangStyles(lang);
+  }
+
+  function setLangStyles(lang) {
+    let styles = langs
+      .filter(function (l) {
+        return l != lang;
+      })
+      .map(function (l) {
+        return ':lang('+ l +') { display: none; }';
+      })
+      .join(' ');
+
+    setStyles(styles);
+  }
+
+
+  function myFunctionEN() {
         var x = "From: " + document.getElementById("fname").value;
         document.getElementById("fname1").innerHTML = x;
         var y = "To: " + document.getElementById("lname").value;
         document.getElementById("lname1").innerHTML = y;
         var dt = new Date();
-        document.getElementById("datetime").innerHTML = ("Date: "+("0"+(dt.getMonth()+1)).slice(-2)) +"/"+ (("0"+dt.getDate()).slice(-2)) +"/"+ (dt.getFullYear()) +" <br>"+ ("Time: "+("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
+        document.getElementById("date").innerHTML = ("Date: "+("0"+(dt.getMonth()+1)).slice(-2)) +"/"+ (("0"+dt.getDate()).slice(-2)) +"/"+ (dt.getFullYear());
+        document.getElementById("time").innerHTML= ("Time: "+("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
+        var date = document.getElementById("date").innerHTML
+        var time = document.getElementById("time").innerHTML
         var a = "Message: " + document.getElementById("subject").value;
         document.getElementById("subject1").innerHTML = a;
       
 
         var hiddenElement = document.createElement('a');
 
-        hiddenElement.href = 'data:attachment/text,' + encodeURI(x) + "\n" + encodeURI(y) +"\n"+ encodeURI(a)+"\n"+ encodeURI(dt);
+        hiddenElement.href = 'data:attachment/text,' + encodeURI(x) + "\n" + encodeURI(y) +"\n"+ encodeURI(a)+"\n"+ encodeURI(date) + "\n" + encodeURI(time);
         hiddenElement.target = '_blank';
-        hiddenElement.download = 'myFile.txt';
+        hiddenElement.download = 'message_EN.txt';
         hiddenElement.click();
-    }
+  }
+
+  function myFunctionCN() {
+        var x = "從: " + document.getElementById("fname").value;
+        document.getElementById("fname2").innerHTML = x;
+        var y = "至: " + document.getElementById("lname").value;
+        document.getElementById("lname2").innerHTML = y;
+        var dt = new Date();
+        document.getElementById("date2").innerHTML = ("日期: "+("0"+(dt.getMonth()+1)).slice(-2)) +"/"+ (("0"+dt.getDate()).slice(-2)) +"/"+ (dt.getFullYear());
+        document.getElementById("time2").innerHTML= ("時間: "+("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
+        var date2 = document.getElementById("date2").innerHTML
+        var time2 = document.getElementById("time2").innerHTML
+        var a = "訊息: " + document.getElementById("subject").value;
+        document.getElementById("subject2").innerHTML = a;
+      
+
+        var hiddenElement = document.createElement('a');
+
+        hiddenElement.href = 'data:attachment/text,' + encodeURI(x) + "\n" + encodeURI(y) +"\n"+ encodeURI(a)+"\n"+ encodeURI(date2) + "\n" + encodeURI(time2);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = 'message_CN.txt';
+        hiddenElement.click();
+  }
 </script>
-
-</body>
-</html>
-
