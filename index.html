@@ -48,11 +48,41 @@
   </style>
 </head>
 <body>
+
+  <!-- Firebase setup start -->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/7.14.0/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-database.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+      https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-analytics.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyAigSTkpQqKVZEl1Cc0F9H4SkLUWWtdIA4",
+      authDomain: "special-topic-memo.firebaseapp.com",
+      databaseURL: "https://special-topic-memo.firebaseio.com",
+      projectId: "special-topic-memo",
+      storageBucket: "special-topic-memo.appspot.com",
+      messagingSenderId: "524301877563",
+      appId: "1:524301877563:web:d4948dd97f0c9fbaba371e",
+      measurementId: "G-2TR5T7FW3T"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
+  <!-- Firebase setup end -->
+
+
   <a href="#" hreflang="en" onclick="setLang('en'); return false">English</a>
-  <a href="#" hreflang="it" onclick="setLang('cn'); return false">Chinese</a>
+  <a href="#" hreflang="it" onclick="setLang('cn'); return false">中文</a>
+  <a href="#" hreflang="it" onclick="setLang('tr'); return false">Türkçe</a>
 
   <div class="container", lang = "en">
-    <form>
+    <form id = "memo_form">
       <label for="fname" >From</label>
       <br>
       <input type="textsmall" id="fname" name="firstname" placeholder="Your name..">
@@ -61,11 +91,16 @@
       <br>
       <input type="textsmall" id="lname" name="lastname" placeholder="Receiver name..">
       <br>
-      <label for="subject">Subject</label>
+      <label for="subject">Message</label>
       <br>
       <textarea id="subject" name="subject" placeholder="Write something.." style = "width: 75%;"></textarea>
     </form>
-    <button onclick="myFunctionEN();">Submit</button>
+    <button type = "submit" onclick="myFunctionEN();">Send</button>
+    <button type = "inbox" onclick="Firebase_Retrieve_Data_EN();">Received</button>
+    <button type = "sent" onclick="Firebase_Retrieve_mySent_EN();">Delivered</button>
+    <p id="notice"></p>
+    <p id="inbox"></p>
+    <p id="sent"></p>
     <p id="fname1"></p>
     <p id="lname1"></p>
     <p id="subject1"></p>
@@ -75,24 +110,55 @@
 
   <div class="container", lang = "cn">
     <form>
-      <label for="fname" >從</label>
+      <label for="fname" >寄件人</label>
       <br>
-      <input type="textsmall" id="fname" name="firstname" placeholder="你的名字..">
+      <input type="textsmall" id="fname2" name="firstname" placeholder="寄件人姓名..">
       <br>
-      <label for="lname">至</label>
+      <label for="lname">收件人</label>
       <br>
-      <input type="textsmall" id="lname" name="lastname" placeholder="收件者姓名..">
+      <input type="textsmall" id="lname2" name="lastname" placeholder="收件者姓名..">
       <br>
-      <label for="subject">信息</label>
+      <label for="subject">信件內容</label>
       <br>
-      <textarea id="subject" name="subject" placeholder="寫一些東西.." style = "width: 75%;"></textarea>
+      <textarea id="subject2" name="subject" placeholder="內容.." style = "width: 75%;"></textarea>
     </form>
     <button onclick="myFunctionCN();">提交</button>
+    <button type = "inbox2" onclick="Firebase_Retrieve_Data_CN();">紀錄</button>
+    <button type = "sent2" onclick="Firebase_Retrieve_mySent_CN();">寄件備份</button>
+    <p id="notice2"></p>
+    <p id="inbox2"></p>
+    <p id="sent2"></p>
     <p id="fname2"></p>
     <p id="lname2"></p>
     <p id="subject2"></p>
     <p><span id="date2"></span></p>
     <p><span id="time2"></span></p>
+  </div>
+  <div class="container", lang = "tr">
+    <form>
+      <label for="fname" >Gonderen</label>
+      <br>
+      <input type="textsmall" id="fname3" name="firstname" placeholder="Isminiz..">
+      <br>
+      <label for="lname">Gonderilen</label>
+      <br>
+      <input type="textsmall" id="lname3" name="lastname" placeholder="Gonderilenin ismi..">
+      <br>
+      <label for="subject">Mesajiniz</label>
+      <br>
+      <textarea id="subject3" name="subject" placeholder="Mesajinizi buraya yazin.." style = "width: 75%;"></textarea>
+    </form>
+    <button onclick="myFunctionTR();">Yolla</button>
+    <button type = "inbox3" onclick="Firebase_Retrieve_Data_TR();">Gelen Kutusu</button>
+    <button type = "sent3" onclick="Firebase_Retrieve_mySent_TR();">Giden Kutusu</button>
+    <p id="notice3"></p>
+    <p id="inbox3"></p>
+    <p id="sent3"></p>
+    <p id="fname3"></p>
+    <p id="lname3"></p>
+    <p id="subject3"></p>
+    <p><span id="date3"></span></p>
+    <p><span id="time3"></span></p>
   </div>
 
 </body>
@@ -100,7 +166,7 @@
 
 
 <script>
-  let langs = ['en', 'cn'];
+  let langs = ['en', 'cn', 'tr'];
   let lang = 'en';
   setLangStyles(lang);
 
@@ -142,46 +208,229 @@
 
 
   function myFunctionEN() {
-        var x = "From: " + document.getElementById("fname").value;
-        document.getElementById("fname1").innerHTML = x;
-        var y = "To: " + document.getElementById("lname").value;
-        document.getElementById("lname1").innerHTML = y;
+        //firebase initialize
+        var memoRef = firebase.database().ref("Memos");
+        newMemoRef = memoRef.push();
+
+        if (document.getElementById("fname").value == 0)
+        {
+          alert("Empty space in From!")
+          return false;
+        }
+        if (document.getElementById("lname").value == 0)
+        {
+          alert("Empty space in To!")
+          return false;
+        }
+        if (document.getElementById("subject").value == 0)
+        {
+          alert("Empty space in subject!")
+          return false;
+        }
+
+        //send to firebase
         var dt = new Date();
-        document.getElementById("date").innerHTML = ("Date: "+("0"+(dt.getMonth()+1)).slice(-2)) +"/"+ (("0"+dt.getDate()).slice(-2)) +"/"+ (dt.getFullYear());
-        document.getElementById("time").innerHTML= ("Time: "+("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
-        var date = document.getElementById("date").innerHTML
-        var time = document.getElementById("time").innerHTML
-        var a = "Message: " + document.getElementById("subject").value;
-        document.getElementById("subject1").innerHTML = a;
-      
-
-        var hiddenElement = document.createElement('a');
-
-        hiddenElement.href = 'data:attachment/text,' + encodeURI(x) + "\n" + encodeURI(y) +"\n"+ encodeURI(a)+"\n"+ encodeURI(date) + "\n" + encodeURI(time);
-        hiddenElement.target = '_blank';
-        hiddenElement.download = 'message_EN.txt';
-        hiddenElement.click();
+        newMemoRef.set({
+          Sender: document.getElementById("fname").value,
+          Receiver: document.getElementById("lname").value,
+          Message: document.getElementById("subject").value,
+          Date: ("0"+(dt.getMonth()+1)).slice(-2) +"/"+ (("0"+dt.getDate()).slice(-2)) +"/"+ (dt.getFullYear()),
+          Time: ("0"+dt.getHours()).slice(-2) +":"+ (("0"+dt.getMinutes()).slice(-2)),
+        });
+        document.getElementById("notice").innerHTML = "Your message has been sent!<br>Click Delivered to see your sent messages or Received to see messages sent to you!";
+        document.getElementById("sent").innerHTML = "";
+        document.getElementById("inbox").innerHTML = "";
   }
 
   function myFunctionCN() {
-        var x = "從: " + document.getElementById("fname").value;
-        document.getElementById("fname2").innerHTML = x;
-        var y = "至: " + document.getElementById("lname").value;
-        document.getElementById("lname2").innerHTML = y;
+        //firebase initialize
+        var memoRef = firebase.database().ref("Memos");
+        newMemoRef = memoRef.push();
+
+        if (document.getElementById("fname2").value == 0)
+        {
+          alert("寄件人的欄位不能留白!")
+          return false;
+        }
+        if (document.getElementById("lname2").value == 0)
+        {
+          alert("收件人的欄位不能留白!")
+          return false;
+        }
+        if (document.getElementById("subject2").value == 0)
+        {
+          alert("信件內容的欄位不能留白!")
+          return false;
+        }
+
+        //send to firebase
         var dt = new Date();
-        document.getElementById("date2").innerHTML = ("日期: "+("0"+(dt.getMonth()+1)).slice(-2)) +"/"+ (("0"+dt.getDate()).slice(-2)) +"/"+ (dt.getFullYear());
-        document.getElementById("time2").innerHTML= ("時間: "+("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
-        var date2 = document.getElementById("date2").innerHTML
-        var time2 = document.getElementById("time2").innerHTML
-        var a = "訊息: " + document.getElementById("subject").value;
-        document.getElementById("subject2").innerHTML = a;
-      
-
-        var hiddenElement = document.createElement('a');
-
-        hiddenElement.href = 'data:attachment/text,' + encodeURI(x) + "\n" + encodeURI(y) +"\n"+ encodeURI(a)+"\n"+ encodeURI(date2) + "\n" + encodeURI(time2);
-        hiddenElement.target = '_blank';
-        hiddenElement.download = 'message_CN.txt';
-        hiddenElement.click();
+        newMemoRef.set({
+          Sender: document.getElementById("fname2").value,
+          Receiver: document.getElementById("lname2").value,
+          Message: document.getElementById("subject2").value,
+          Date: ("0"+(dt.getMonth()+1)).slice(-2) +"/"+ (("0"+dt.getDate()).slice(-2)) +"/"+ (dt.getFullYear()),
+          Time: ("0"+dt.getHours()).slice(-2) +":"+ (("0"+dt.getMinutes()).slice(-2)),
+        });
+        document.getElementById("notice2").innerHTML = "您的消息已發送！<br>單擊“已發送”以查看您已發送的消息，或單擊“已接收”以查看發送給您的消息！";
+        document.getElementById("sent2").innerHTML = "";
+        document.getElementById("inbox2").innerHTML = "";
   }
+
+  function myFunctionTR() {
+        //firebase initialize
+        var memoRef = firebase.database().ref("Memos");
+        newMemoRef = memoRef.push();
+
+        if (document.getElementById("fname3").value == 0)
+        {
+          alert("Gonderen belli degil!")
+          return false;
+        }
+        if (document.getElementById("lname3").value == 0)
+        {
+          alert("Gonderilen belli degil!")
+          return false;
+        }
+        if (document.getElementById("subject3").value == 0)
+        {
+          alert("Mesaj belli degil!")
+          return false;
+        }
+
+        //send to firebase
+        var dt = new Date();
+        newMemoRef.set({
+          Sender: document.getElementById("fname3").value,
+          Receiver: document.getElementById("lname3").value,
+          Message: document.getElementById("subject3").value,
+          Date: ("0"+(dt.getMonth()+1)).slice(-2) +"/"+ (("0"+dt.getDate()).slice(-2)) +"/"+ (dt.getFullYear()),
+          Time: ("0"+dt.getHours()).slice(-2) +":"+ (("0"+dt.getMinutes()).slice(-2)),
+        });
+        document.getElementById("notice3").innerHTML = "Mesajınız başarıyla gönderilmiştir!<br>Gönderilen mesajlarınızı görmek istiyorsanız lütfen Giden Kutusuna, size gelen mesajları görmek istiyorsanız lütfen Gelen kutusuna tıklayınız!";
+        document.getElementById("sent3").innerHTML = "";
+        document.getElementById("inbox3").innerHTML = "";
+  }
+  function Firebase_Retrieve_Data_EN(){
+    receiver_name = document.getElementById("fname").value
+    var leadsRef = firebase.database().ref("Memos");
+    var fb_delivered = new Array();
+    var i = 0;
+    document.getElementById("notice").innerHTML = "";
+    document.getElementById("sent").innerHTML = "";
+    document.getElementById("inbox").innerHTML = "";
+    leadsRef.on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        var childData = childSnapshot.val();
+        if(childData.Receiver == receiver_name){
+          fb_delivered[i] = "-------------------------<br>From: " + childData.Sender + "<br>" + childData.Date + ", " + childData.Time + "<br>" + childData.Message + "<br>";
+          i++;
+        }
+      });
+      fb_delivered.reverse();
+      document.getElementById("inbox").innerHTML = fb_delivered.join("<br>");
+    });
+  }
+  function Firebase_Retrieve_mySent_EN(){
+    sender_name = document.getElementById("fname").value
+    var leadsRef = firebase.database().ref("Memos");
+    var fb_delivered = new Array();
+    var i = 0;
+    document.getElementById("notice").innerHTML = "";
+    document.getElementById("sent").innerHTML = "";
+    document.getElementById("inbox").innerHTML = "";
+    leadsRef.on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        var childData = childSnapshot.val();
+        if(childData.Sender == sender_name){
+          fb_delivered[i] = "-------------------------<br>To: " + childData.Receiver + "<br>" + childData.Date + ", " + childData.Time + "<br>" + childData.Message + "<br>";
+          i++;
+        }
+      });
+      fb_delivered.reverse();
+      document.getElementById("sent").innerHTML = fb_delivered.join("<br>");
+    });
+  }
+  function Firebase_Retrieve_Data_CN(){
+    receiver_name = document.getElementById("fname2").value
+    var leadsRef = firebase.database().ref("Memos");
+    var fb_delivered = new Array();
+    var i = 0;
+    document.getElementById("notice2").innerHTML = "";
+    document.getElementById("inbox2").innerHTML = "";
+    document.getElementById("sent2").innerHTML = "";
+    leadsRef.on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        var childData = childSnapshot.val();
+        if(childData.Receiver == receiver_name){
+          fb_delivered[i] = "-------------------------<br>從: " + childData.Sender + "<br>" + childData.Date + ", " + childData.Time + "<br>" + childData.Message + "<br>";
+          i++;
+        }
+      });
+      fb_delivered.reverse();
+      document.getElementById("inbox2").innerHTML = fb_delivered.join("<br>");
+    });
+  }
+  function Firebase_Retrieve_mySent_CN(){
+    sender_name = document.getElementById("fname2").value
+    var leadsRef = firebase.database().ref("Memos");
+    var fb_delivered = new Array();
+    var i = 0;
+    document.getElementById("notice2").innerHTML = "";
+    document.getElementById("sent2").innerHTML = "";
+    document.getElementById("inbox2").innerHTML = "";
+    leadsRef.on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        var childData = childSnapshot.val();
+        if(childData.Sender == sender_name){
+          fb_delivered[i] = "-------------------------<br>至: " + childData.Receiver + "<br>" + childData.Date + ", " + childData.Time + "<br>" + childData.Message + "<br>";
+          i++;
+        }
+      });
+      fb_delivered.reverse();
+      document.getElementById("sent2").innerHTML = fb_delivered.join("<br>");
+    });
+  }
+  function Firebase_Retrieve_Data_TR(){
+    receiver_name = document.getElementById("fname3").value
+    var leadsRef = firebase.database().ref("Memos");
+    var fb_delivered = new Array();
+    var i = 0;
+    document.getElementById("notice3").innerHTML = "";
+    document.getElementById("inbox3").innerHTML = "";
+    document.getElementById("sent3").innerHTML = "";
+    leadsRef.on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        var childData = childSnapshot.val();
+        if(childData.Receiver == receiver_name){
+          fb_delivered[i] = "-------------------------<br>Gonderen: " + childData.Sender + "<br>" + childData.Date + ", " + childData.Time + "<br>" + childData.Message + "<br>";
+          i++;
+        }
+      });
+      fb_delivered.reverse();
+      document.getElementById("inbox3").innerHTML = fb_delivered.join("<br>");
+    });
+  }
+  function Firebase_Retrieve_mySent_TR(){
+    sender_name = document.getElementById("fname3").value
+    var leadsRef = firebase.database().ref("Memos");
+    var fb_delivered = new Array();
+    var i = 0;
+    document.getElementById("notice3").innerHTML = "";
+    document.getElementById("sent3").innerHTML = "";
+    document.getElementById("inbox3").innerHTML = "";
+    leadsRef.on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        var childData = childSnapshot.val();
+        if(childData.Sender == sender_name){
+          fb_delivered[i] = "-------------------------<br>Gonderilen: " + childData.Receiver + "<br>" + childData.Date + ", " + childData.Time + "<br>" + childData.Message + "<br>";
+          i++;
+        }
+      });
+      fb_delivered.reverse();
+      document.getElementById("sent3").innerHTML = fb_delivered.join("<br>");
+    });
+  }
+
+  
 </script>
